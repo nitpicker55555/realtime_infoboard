@@ -9,7 +9,7 @@
 ![image](https://github.com/nitpicker55555/realtime_infoboard/assets/91596298/6d1db129-c31b-4021-9e0a-5622b217287c)
 
 
-3.Pretty easy to upload info to Infoboard <br>
+3.Pretty easy to upload log of program to a web with real-time <br>
 ```python
       from infoweb_client import send_message_to_server
       import asyncio
