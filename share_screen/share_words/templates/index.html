@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<style>
+    #messageList li {
+        white-space: pre-wrap;
+    }
+</style>
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Message Board</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+
+    <form id="messageForm">
+<textarea name="message" rows="5" placeholder="Enter your message" required></textarea>
+<button id="copyLatest">Copy Latest Message</button>
+        <button type="submit">Send</button>
+    </form>
+
+    <h2>Messages:</h2>
+    <ul id="messageList">
+        {% for message in messages %}
+            <li>{{ message }}</li>
+        {% endfor %}
+    </ul>
+
+    <script>
+
+    $(document).ready(function() {
+        let latestMessageCount = {{ messages|length }};
+
+        $('#messageForm').on('submit', function(event) {
+            event.preventDefault();
+
+            let message = $('input[name="message"]').val();
+           $.post("/send", $("#messageForm").serialize(),function(data) {
+                if (data.status === "success") {
+$('#messageList').append('<li>' + escapeHtml(message).replace(/\n/g, '<br>') + '</li>');
+$('textarea[name="message"]').val('');  // Clear the textarea
+latestMessageCount++;
+                }
+            });
+        });
+                function checkForNewMessages() {
+            $.get("/get_messages_count", function(data) {
+                if (data.count > latestMessageCount) {
+                    fetchMessages();
+                    latestMessageCount = data.count;
+                }
+            });
+        }
+
+        function fetchMessages() {
+            $.get("/get_messages", function(data) {
+                $('#messageList').empty();
+                data.messages.forEach(function(message) {
+function escapeHtml(text) {
+    var map = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;',
+        '\t': '    '  // Replace tab with 4 spaces
+    };
+    return text.replace(/[&<>"'\t]/g, function(m) { return map[m]; });
+}
+$('#messageList').prepend('<li>' + escapeHtml(message).replace(/\n/g, '<br>') + '</li>');
+                });
+            });
+        }
+
+        // Poll every 5 seconds
+        setInterval(checkForNewMessages, 500);
+    });
+    $("#copyLatest").click(function() {
+    let latestMessage = $("#messageList li:first").text();
+    let textArea = $("<textarea>");
+    $("body").append(textArea);
+    textArea.val(latestMessage).select();
+    document.execCommand('copy');
+    textArea.remove();
+
+});
+    </script>
+</body>
+</html>

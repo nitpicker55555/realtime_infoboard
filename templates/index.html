@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>WebSocket with Flask</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+</head>
+<body>
+Date Filter: <select id="dateFilter">
+    <option value="all">All Dates</option>
+</select>
+
+IP Filter: <select id="ipFilter">
+    <option value="all">All IPs</option>
+</select>
+File Filter: <select id="fileFilter">
+    <option value="all">All Files</option>
+</select>
+<button id="clearAll">Clear All Messages</button>
+<ul id="messages"></ul>
+
+<script type="text/javascript">
+
+    const socket = io.connect('http://' + document.domain + ':' + location.port);
+    const dateFilter = document.getElementById('dateFilter');
+    const ipFilter = document.getElementById('ipFilter');
+        const fileFilter = document.getElementById('fileFilter');
+    socket.on('message_from_server', function(data) {
+        const li = document.createElement('li');
+        const date = data.message.split(' ')[3];  // Extract date from the message
+        const dateButton = document.createElement('button');
+        dateButton.textContent = date;
+        dateButton.addEventListener('click', function() {
+            Array.from(document.querySelectorAll("#messages > li")).forEach(function(li) {
+                if (!li.textContent.includes(date)) {
+                    li.style.display = 'none';
+                } else {
+                    li.style.display = 'block';
+                }
+            });
+        });
+
+        li.textContent = data.message;
+        li.appendChild(dateButton);
+        if (messages.firstChild) {
+    messages.insertBefore(li, messages.firstChild);
+} else {
+    messages.appendChild(li);
+}
+    });
+       function filterMessages() {
+        const selectedDate = dateFilter.value;
+        const selectedIP = ipFilter.value;
+        const selectedFile = fileFilter.value;
+        Array.from(document.querySelectorAll("#messages > li")).forEach(function(li) {
+            const dateMatch = selectedDate === 'all' || li.textContent.includes(selectedDate);
+            const ipMatch = selectedIP === 'all' || li.textContent.includes(selectedIP);
+            const fileMatch = selectedFile === 'all' || li.textContent.includes(selectedFile);
+            if (dateMatch && ipMatch && fileMatch) {
+                li.style.display = 'block';
+            } else {
+                li.style.display = 'none';
+            }
+        });
+    }
+       dateFilter.addEventListener('change', filterMessages);
+    ipFilter.addEventListener('change', filterMessages);
+fileFilter.addEventListener('change', filterMessages);
+    dateFilter.addEventListener('change', function() {
+        const selectedDate = dateFilter.value;
+        Array.from(document.querySelectorAll("#messages > li")).forEach(function(li) {
+            if (selectedDate === 'all' || li.textContent.includes(selectedDate)) {
+                li.style.display = 'block';
+            } else {
+                li.style.display = 'none';
+            }
+        });
+    });
+
+    document.getElementById('clearAll').addEventListener('click', function() {
+        document.querySelector("#messages").innerHTML = '';  // Clear the messages in frontend
+        socket.emit('clear_all_messages');  // Tell the server to clear all messages
+    });
+
+    socket.on('connect', function() {
+        socket.emit('get_all_messages');
+        socket.emit('get_all_dates');
+        socket.emit('get_all_ips');
+        socket.emit('get_all_files');
+    });
+
+        socket.on('ips_from_server', function(data) {
+        const existingIPs = Array.from(ipFilter.options).map(opt => opt.value);
+        data.ips.forEach(function(ip) {
+            if (!existingIPs.includes(ip)) {
+                const option = document.createElement('option');
+                option.value = ip;
+                option.textContent = ip;
+                ipFilter.appendChild(option);
+            }
+        });
+    });
+    socket.on('dates_from_server', function(data) {
+        const existingDates = Array.from(dateFilter.options).map(opt => opt.value);
+        data.dates.forEach(function(date) {
+            if (!existingDates.includes(date)) {
+                const option = document.createElement('option');
+                option.value = date;
+                option.textContent = date;
+                dateFilter.appendChild(option);
+            }
+        });
+    });
+
+        socket.on('files_from_server', function(data) {
+        const existingFiles = Array.from(fileFilter.options).map(opt => opt.value);
+        data.files.forEach(function(file) {
+            if (!existingFiles.includes(file)) {
+                const option = document.createElement('option');
+                option.value = file;
+                option.textContent = file;
+                fileFilter.appendChild(option);
+            }
+        });
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<style>
+    #progressbar-container {
+        width: 100%;
+        background-color: #ccc;
+        height: 20px;
+    }
+
+    #progressbar {
+        height: 100%;
+        width: 0;
+        background-color: #4CAF50;
+    }
+</style>
+
+<head>
+    <title>Progress Demo</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+
+<div id="messages"></div>
+
+<div id="progressbar-container">
+    <div id="progressbar"></div>
+</div>
+
+<script type="text/javascript">
+    var socket = io.connect('http://' + document.domain + ':' + location.port);
+
+    socket.on('message_from_server', function(data) {
+        $('#messages').append($('<p>').text(data.message));
+    });
+
+    socket.on('update_progress', function(data) {
+        $('#progressbar').css('width', data.percentage + '%');
+        $('#messages').append($('<p>').text(`File: ${data.filename} Progress: ${data.percentage}%`));
+    });
+</script>
+
+
+</body>
+</html>

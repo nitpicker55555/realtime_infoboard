@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Rotate Image</title>
+    <style>
+        #rotating-image {
+            transition: transform 0.1s;
+        }
+    </style>
+</head>
+<body>
+    <img id="rotating-image" src="{{ image_path }}" alt="Uploaded Image" width="300px">
+    <br>
+    <label for="rotation-slider">Rotate: </label>
+    <input type="range" id="rotation-slider" min="0" max="360" value="0" oninput="rotateImage(this.value)">
+
+    <script>
+        function rotateImage(angle) {
+            document.getElementById('rotating-image').style.transform = `rotate(${angle}deg)`;
+        }
+    </script>
+</body>
+</html>

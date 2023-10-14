@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>文件上传和下载</title>
+</head>
+<body>
+    <h1>上传文件</h1>
+    <form method="POST" action="/upload" enctype="multipart/form-data">
+        <input type="file" name="file">
+        <input type="submit" value="上传">
+    </form>
+<form method="POST" action="/upload" enctype="multipart/form-data" id="upload-form">
+    <div class="drop-zone" id="drop-zone">
+        <p>将文件拖放到此处，或点击选择文件</p>
+        <input type="file" name="file" id="file-input">
+    </div>
+    <input type="submit" value="上传" style="display: none;">
+</form>
+    <h2>已上传文件列表</h2>
+    <ul>
+        {% for file in files %}
+            <li><a href="/uploads/{{ file }}">{{ file }}</a></li>
+        {% endfor %}
+    </ul>
+
+
+
+<script>
+
+    const dropZone = document.getElementById('drop-zone');
+    const fileInput = document.getElementById('file-input');
+    const uploadForm = document.getElementById('upload-form');
+
+    dropZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dropZone.classList.add('dragover');
+    });
+
+    dropZone.addEventListener('dragleave', () => {
+        dropZone.classList.remove('dragover');
+    });
+
+    dropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropZone.classList.remove('dragover');
+        const files = e.dataTransfer.files;
+        fileInput.files = files;
+        uploadForm.submit();
+    });
+
+
+</script>
+</body>
+</html>
