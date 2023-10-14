@@ -9,6 +9,8 @@
 
 3.Pretty easy to upload info to Infoboard <br>
 ```python
+      from infoweb_client import send_message_to_server
+      import asyncio
       asyncio.run (send_message_to_server("message you want to sahre"))
 ```
 Of course you can filter the message in Infoboard by setting regulations
