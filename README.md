@@ -1,13 +1,13 @@
 # realtime_infoboard
-drag to share files in same network <br>
+1.Drag to share files in same network <br>
 ![image](https://github.com/nitpicker55555/realtime_infoboard/assets/91596298/542536f5-e4bc-41db-ac26-81b7cb7c87f6)
 
-share words(including multilines and tab symbol),and you can directly copy latest message. <br>
+2.Sharing words(including multilines and tab symbol),and you can directly copy latest message. <br>
 (Is pretty useful when you want to handle a computer without social application) <br>
 ![image](https://github.com/nitpicker55555/realtime_infoboard/assets/91596298/6d1db129-c31b-4021-9e0a-5622b217287c)
 
 
-Pretty easy to upload info to Infoboard <br>
+3.Pretty easy to upload info to Infoboard <br>
 
       asyncio.run (send_message_to_server("message you want to sahre")) 
 Of course you can filter the message in Infoboard by setting regulations
