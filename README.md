@@ -1,9 +1,11 @@
 # realtime_infoboard
 drag to share files in same network <br>
-![image](https://github.com/nitpicker55555/realtime_infoboard/assets/91596298/a99d76a2-5434-429e-ad9c-2e8f52348b4c)<br>
-share words(include multilines words in same network),and you can directly copy latest message. <br>
+![image](https://github.com/nitpicker55555/realtime_infoboard/assets/91596298/542536f5-e4bc-41db-ac26-81b7cb7c87f6)
+
+share words(including multilines and tab symbol),and you can directly copy latest message. <br>
 (Is pretty useful when you want to handle a computer without social application) <br>
-![image](https://github.com/nitpicker55555/realtime_infoboard/assets/91596298/6a8d067b-d76f-4373-88c9-bb90b026066b)<br>
+![image](https://github.com/nitpicker55555/realtime_infoboard/assets/91596298/6d1db129-c31b-4021-9e0a-5622b217287c)
+
 
 Pretty easy to upload info to Infoboard <br>
 
