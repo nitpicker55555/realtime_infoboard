@@ -9,7 +9,7 @@ async def send_message_to_server(message):
         await sio.emit('message_from_client', {'message': message})
         print("Message sent.")
 
-    await sio.connect('http://129.159.198.118:5000')
+    await sio.connect('http://')
     #     await sio.wait()  # Waiting for all tasks to complete (if there's any event listener running)
     # finally:
     await sio.disconnect()
