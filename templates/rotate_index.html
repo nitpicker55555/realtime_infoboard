@@ -1,13 +1,65 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Upload Image</title>
+    <title>图片上传和拖动</title>
 </head>
 <body>
-    <form action="/upload" method="post" enctype="multipart/form-data">
-        <input type="file" name="file">
-        <input type="submit" value="Upload">
-    </form>
+<form action="/upload" method="post" enctype="multipart/form-data">
+    <input type="file" name="file1">
+    <input type="file" name="file2">
+    <input type="submit" value="上传">
+</form>
+
+{% for filename in filenames %}
+<img class="uploaded-image" src="{{ url_for('static', filename='uploads/' + filename) }}" draggable="true">
+{% endfor %}
+
+<input type="range" id="rotate-slider" min="0" max="360" value="0">
+
+<script>
+    let activeImage = null;
+    // JavaScript 代码来实现拖动功能
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('.uploaded-image').forEach(img => {
+            img.addEventListener('mousedown', (event) => {
+                activeImage = img;
+                let shiftX = event.clientX - img.getBoundingClientRect().left;
+                let shiftY = event.clientY - img.getBoundingClientRect().top;
+
+                img.style.position = 'absolute';
+                img.style.zIndex = 1000;
+                document.body.append(img);
+
+                function moveAt(pageX, pageY) {
+                    img.style.left = pageX - shiftX + 'px';
+                    img.style.top = pageY - shiftY + 'px';
+                }
+
+                function onMouseMove(event) {
+                    moveAt(event.pageX, event.pageY);
+                }
+
+                document.addEventListener('mousemove', onMouseMove);
+
+                img.onmouseup = function() {
+                    document.removeEventListener('mousemove', onMouseMove);
+                    img.onmouseup = null;
+                };
+            });
+
+            img.ondragstart = function() {
+                return false;
+            };
+
+            const slider = document.getElementById('rotate-slider');
+            slider.addEventListener('input', (event) => {
+                if (activeImage) {
+                    const rotation = event.target.value;
+                    activeImage.style.transform = `rotate(${rotation}deg)`;
+                }
+            });
+            });
+        });
+</script>
 </body>
 </html>

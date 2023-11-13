@@ -13,6 +13,8 @@ from selenium.webdriver.chrome.options import Options
 from functools import wraps
 import json, os
 from selenium.common.exceptions import NoSuchElementException
+from infoweb_client import send_message_to_server
+import asyncio,mmap
 # from selenium.webdriver.chrome.service import Service
 """
 cd C:\Program Files\Google\Chrome\Application
@@ -298,6 +300,8 @@ def iteration(url, driver,num):
                         break
                     else:
                         print("卡住了")
+
+
                 except:
                     print("Thread", num, "no tweet found but no Retry")
                     elements = driver.find_elements_by_xpath(xpath_str)
@@ -306,6 +310,7 @@ def iteration(url, driver,num):
                 stuck_num += 1
                 print("卡住了", stuck_num)
                 delay = random.uniform(50, 60) * stuck_num
+                asyncio.run(send_message_to_server(["Stuck Thread:", str(num), "Retry after %s seconds"%str(delay)[0:4]]))
                 time.sleep(300 + delay)
                 driver.refresh()
             else:
@@ -325,7 +330,11 @@ def iteration(url, driver,num):
         delay = random.uniform(1, 8)
         time.sleep(delay)
     return dict_list
+def count_lines(filename):
+    with open(filename, "r+") as f:
+        mmapped_file = mmap.mmap(f.fileno(), 0, access=mmap.ACCESS_READ)
 
+        return mmapped_file.read().count(b'\n')
 
 def iteration_profile(data_queue, lock, num,with_profile_file):
     # all_handles = driver.window_handles
@@ -352,6 +361,14 @@ def iteration_profile(data_queue, lock, num,with_profile_file):
         else:
             print("link alreday in.....")
         item_.update(profile_dict[item_['link']])
+        try:
+            sum_lines=count_lines(with_profile_file)
+        except:
+            sum_lines=0
+        without_profile_file_sum_lines = count_lines(str(with_profile_file).replace("with","without"))
+        process_percentage=(sum_lines/without_profile_file_sum_lines)*100
+        asyncio.run (send_message_to_server(["Processed_file",with_profile_file, "Processed_percentage: {:.2f}%".format(process_percentage),"Processed_lines:",sum_lines]))
+
         with lock:
             with open(with_profile_file, "a") as file:
                 file.write(json.dumps(item_) + "\n")
@@ -384,6 +401,12 @@ def url_time_test(data_queue, lock, num, without_profile_file):
         print("+++++++++++++++++++++++++++++++++++++++++++++++")
         print("+++++++++++++++++++++++++++++++++++++++++++++++")
         dict_list = iteration(url_need, driver,num)
+        try:
+            sum_lines=count_lines(without_profile_file)
+        except:
+            sum_lines=0
+        process_percentage=year_percentage(until_date)
+        asyncio.run (send_message_to_server(["Processed_file",without_profile_file, "Processed_percentage: {:.2f}%".format(process_percentage),"Processed_lines:",sum_lines,"Page_right_now:",str(since_date.strftime('%Y-%m-%d')),"this_page:",len(dict_list)]))
         with lock:
             for i in dict_list:
                 with open(without_profile_file, "a") as file:
@@ -471,6 +494,27 @@ def last_date_in_file(file_path):
 
 # data_transfer()
 
+def year_percentage(date_str):
+    try:
+        print(date_str,"===")
+        date = datetime.strptime(date_str, "%Y-%m-%d")
+        start_of_year = datetime(date.year, 1, 1)
+
+        # Check if it's a leap year
+        if date.year % 4 == 0 and (date.year % 100 != 0 or date.year % 400 == 0):
+            total_days = 366
+        else:
+            total_days = 365
+
+        days_passed = (date - start_of_year).days + 1  # Add 1 because we count the start day itself
+
+        percentage = (days_passed / total_days) * 100
+    except Exception as e:
+        print(e,"error")
+        percentage="0"
+    return percentage
+
+
 def multitask(mode, startdate_set="", enddate_set=""):
     time_start = time.time()
     without_profile_file = startdate_set + "_" + enddate_set + "_" + "without_profile.jsonl"
@@ -552,6 +596,16 @@ def multitask(mode, startdate_set="", enddate_set=""):
 # multitask("profile", "2021-1-1", "2021-12-31")
 # multitask("content", "2020-1-1", "2020-12-31")
 # multitask("profile", "2020-1-1", "2020-12-31")
-multitask("content", "2019-1-1", "2019-12-31")
+# multitask("content", "2019-1-1", "2019-12-31")
+multitask("profile", "2019-1-1", "2019-12-31")
 multitask("content", "2018-1-1", "2018-12-31")
+multitask("profile", "2018-1-1", "2018-12-31")
+
 multitask("content", "2017-1-1", "2017-12-31")
+multitask("profile", "2017-1-1", "2017-12-31")
+
+multitask("content", "2016-1-1", "2016-12-31")
+multitask("profile", "2016-1-1", "2016-12-31")
+
+multitask("content", "2015-1-1", "2015-12-31")
+multitask("profile", "2015-1-1", "2015-12-31")
